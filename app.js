@@ -8,7 +8,12 @@ function handleLoanFormSubmit(e) {
     const interest = extractValue(e, 'interest');
     const years = extractValue(e, 'years');
 
+
     console.log(amount, interest, years);
+
+    if (!isValidFormInput(amount, interest, years)) {
+        showError('Please check your numbers');
+    }
 
     const {monthlyPay, totalPay, totalInterest} = calcLoan(amount, interest, years);
 
@@ -22,7 +27,34 @@ function handleLoanFormSubmit(e) {
 function extractValue(e, kind) {
     const inputElem = e.target.querySelector(`#${kind}`);
     console.log(inputElem);
-    return inputElem.valueAsNumber
+    return parseFloat(inputElem.value);
+}
+
+function isValidFormInput(amount, interest, years) {
+    if (isNaN(amount) || isNaN(interest) || isNaN(years)) {
+        return false;
+    } else {
+        return true;
+    }
+}
+
+function showError(errorMessage) {
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'alert alert-danger';
+    errorDiv.appendChild(document.createTextNode(errorMessage));
+
+    const card = document.querySelector('.card');
+    const heading = document.querySelector('.heading');
+
+    // adding errorDiv inside the card but before heading.
+    card.insertBefore(errorDiv, heading);
+
+    // clear error after 3 seconds
+    setTimeout(clearError, 3000);
+}
+
+function clearError() {
+    document.querySelector('.alert').remove();
 }
 
 function calcLoan(amount, interest, years) {
