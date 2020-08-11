@@ -1,7 +1,12 @@
 const loanForm = document.querySelector('#loan-form');
+loanForm.addEventListener('submit', handleLoanFormSubmit);
 
 
 function handleLoanFormSubmit(e) {
+
+    // hide results
+    document.querySelector('#results').style.display = 'none';
+
     console.log(e)
 
     const amount = extractValue(e, 'amount');
@@ -13,13 +18,20 @@ function handleLoanFormSubmit(e) {
 
     if (!isValidFormInput(amount, interest, years)) {
         showError('Please check your numbers');
+    } else {
+
+
+        // show loader
+        document.querySelector('#loading').style.display = 'block';
+
+        const { monthlyPay, totalPay, totalInterest } = calcLoan(amount, interest, years);
+
+        console.log(monthlyPay, totalPay, totalInterest);
+
+        setTimeout(updateResults, 2000, monthlyPay, totalPay, totalInterest);
+
+
     }
-
-    const {monthlyPay, totalPay, totalInterest} = calcLoan(amount, interest, years);
-
-    console.log(monthlyPay, totalPay, totalInterest);
-
-    updateResults(monthlyPay, totalPay, totalInterest);
 
     e.preventDefault();
 }
@@ -58,7 +70,7 @@ function clearError() {
 }
 
 function calcLoan(amount, interest, years) {
-    totalInterest = amount * (interest/100);
+    totalInterest = amount * (interest / 100);
     totalPay = amount + totalInterest;
     monthlyPay = Math.round((totalPay / (years * 12 + Number.EPSILON)) * 100) / 100;
     return {
@@ -76,6 +88,8 @@ function updateResults(monthlyPay, totalPay, totalInterest) {
     monPayInput.value = monthlyPay;
     totPayInput.value = totalPay;
     totIntInput.value = totalInterest
+
+    document.querySelector('#loading').style.display = 'none';
+    document.querySelector('#results').style.display = 'block';
 }
 
-loanForm.addEventListener('submit', handleLoanFormSubmit)
